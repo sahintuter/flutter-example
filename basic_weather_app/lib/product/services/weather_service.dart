@@ -14,7 +14,6 @@ class WeatherService {
       final response = await http.get(Uri.parse(apiUrl));
 
       if (response.statusCode == 200) {
-        print("API Response: ${utf8.decode(response.bodyBytes)}"); // API yanıtını UTF-8 olarak çöz ve yazdır
         return ApiResponse.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
       } else {
         throw Exception("Failed to load weather: ${response.statusCode} ${response.body}");
