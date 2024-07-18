@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:basic_weather_app/core/constants.dart';
 import 'package:basic_weather_app/product/models/weather_model.dart';
@@ -13,8 +14,9 @@ class WeatherService {
     try {
       final response = await http.get(Uri.parse(apiUrl));
 
-      if (response.statusCode == 200) {
-        return ApiResponse.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
+      if (response.statusCode == HttpStatus.ok) {
+      
+        return ApiResponse.fromJson(jsonDecode(response.body));
       } else {
         throw Exception("Failed to load weather: ${response.statusCode} ${response.body}");
       }

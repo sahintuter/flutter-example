@@ -1,65 +1,68 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:basic_weather_app/product/services/weather_service.dart';
-import 'package:basic_weather_app/product/models/weather_model.dart';
-
 import 'package:lottie/lottie.dart';
+import 'package:provider/provider.dart';
+import 'package:basic_weather_app/product/viewmodels/weather_view_model.dart';
 
-
-class HomepageView extends StatefulWidget {
-  const HomepageView({super.key});
-
-  @override
-  HomepageViewState createState() => HomepageViewState();
-}
-
-class HomepageViewState extends State<HomepageView> {
-  ApiResponse? _response;
+class HomepageView extends StatelessWidget {
+  const HomepageView({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        backgroundColor: Colors.black45,
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: SearchBar(
-                  hintText: "Search City...",
-                  onSubmitted: (value) {
-                    _getWeatherData(value);
-                  },
-                ),
-              ),
-
-              Lottie.asset(getWeatherAnimation(_response?.current?.condition?.text ?? 'N/A')),
-
-
-                Column(
+        backgroundColor: Colors.blueAccent,
+        body: ChangeNotifierProvider(
+          create: (_) => WeatherViewModel(),
+          builder: (context, _) {
+            final viewModel = Provider.of<WeatherViewModel>(context);
+            return SingleChildScrollView(
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Text(
-                      _response != null ? '${_response!.current?.tempC}°C' : "City Waiting...",
-                      style: customTextStyle(context),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 50),
+                      child: SearchBar(
+                        hintText: "Search City...",
+                        onSubmitted: (value) {
+                          viewModel.getWeatherData(value);
+                        },
+                      ),
                     ),
-                                 
-                    Text(
-                     _response != null ? _response!.current?.condition?.text ?? 'N/A' : "City Waiting...",
-                      style: customTextStyle(context),
+                    viewModel.isLoading
+                        ? CircularProgressIndicator()
+                        : Lottie.asset(_getWeatherAnimation(
+                            viewModel.response?.current?.condition?.text ?? 'N/A')),
+                    Column(
+                       mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          viewModel.response != null
+                              ? '${viewModel.response!.current?.tempC}°C'
+                              : "City Waiting...",
+                          style: _customTextStyle(context),
+                        ),
+                        Text(
+                          viewModel.response != null
+                              ? viewModel.response!.current?.condition?.text ?? 'N/A'
+                              : "City Waiting...",
+                          style: _customTextStyle(context),
+                        ),
+                      ],
                     ),
                   ],
                 ),
-            ],
-          ),
+              ),
+            );
+          },
         ),
       ),
     );
   }
 
-  TextStyle customTextStyle(BuildContext context) {
+  TextStyle _customTextStyle(BuildContext context) {
     return GoogleFonts.nunito(
       textStyle: Theme.of(context).textTheme.headlineMedium?.copyWith(
             fontWeight: FontWeight.bold,
@@ -68,44 +71,28 @@ class HomepageViewState extends State<HomepageView> {
     );
   }
 
-  Future<void> _getWeatherData(String location) async {
-    try {
-      ApiResponse response = await WeatherService().getCurrentWeather(location);
-      setState(() {
-        _response = response;
-      });
-    } catch (e) {
-      print("Error fetching weather data: $e");
-      // Hataları kullanıcıya bildir, örneğin Snackbar veya alert dialog göster
+  String _getWeatherAnimation(String? condition) {
+    if (condition == null) return 'assets/loading.json';
+
+    switch (condition.toLowerCase()) {
+      case 'clouds':
+      case 'partly cloudy':
+      case 'cloudly':
+      case 'overcast':
+      case 'fog':
+        return 'assets/cloudly.json';
+      case 'rain':
+      case 'moderate rain':
+      case 'light rain':
+      case 'shower rain':
+      case 'patchy rain nearby':
+      case 'light rain shower':
+        return 'assets/rain.json';
+      case 'sunny':
+      case 'clear':
+        return 'assets/sunny.json';
+      default:
+        return 'assets/sunny.json';
     }
   }
-
-String getWeatherAnimation(String? condition){
-
-if (condition == null) return 'assets/loading.json';
-  
-  switch (condition.toLowerCase()) {
-    case 'clouds':
-    case 'partly cloudy':
-    case 'cloudly':
-    case 'overcast':
-    case 'fog':
-      return 'assets/cloudly.json';
-    case 'rain':
-    case 'moderate rain':
-    case 'light rain':
-    case 'shower rain':
-    case 'patchy rain nearby':
-    case 'light rain shower':
-      return 'assets/rain.json';  
-    case 'sunny':
-      return 'assets/sunny.json'; 
-    default:
-      return 'assets/loading.json';
-  }
-  
-
-}
-
-
 }
