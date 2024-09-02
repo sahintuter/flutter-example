@@ -3,7 +3,6 @@ import 'package:basic_weather_app/product/services/weather_service.dart';
 import 'package:flutter/material.dart';
 
 class WeatherViewModel extends ChangeNotifier {
-  
   final WeatherService _weatherService = WeatherService();
 
   ApiResponse? _response;
@@ -21,7 +20,7 @@ class WeatherViewModel extends ChangeNotifier {
       ApiResponse response = await _weatherService.getCurrentWeather(location);
       _response = response;
     } catch (e) {
-      print("Error fetching weather data: $e");
+      // print("Error fetching weather data: $e");
       // Hata durumunu daha iyi anlamak için burada loglama veya hata işleme ekleyin
       throw Exception("Error fetching weather data: $e");
     } finally {

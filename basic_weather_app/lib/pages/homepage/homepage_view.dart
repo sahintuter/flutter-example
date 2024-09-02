@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:basic_weather_app/product/viewmodels/weather_view_model.dart';
 
 class HomepageView extends StatelessWidget {
-  const HomepageView({Key? key}) : super(key: key);
+  const HomepageView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +23,8 @@ class HomepageView extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 50),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 50),
                       child: SearchBar(
                         hintText: "Search City...",
                         onSubmitted: (value) {
@@ -32,11 +33,12 @@ class HomepageView extends StatelessWidget {
                       ),
                     ),
                     viewModel.isLoading
-                        ? CircularProgressIndicator()
+                        ? const CircularProgressIndicator()
                         : Lottie.asset(_getWeatherAnimation(
-                            viewModel.response?.current?.condition?.text ?? 'N/A')),
+                            viewModel.response?.current?.condition?.text ??
+                                'N/A')),
                     Column(
-                       mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
                           viewModel.response != null
@@ -46,7 +48,8 @@ class HomepageView extends StatelessWidget {
                         ),
                         Text(
                           viewModel.response != null
-                              ? viewModel.response!.current?.condition?.text ?? 'N/A'
+                              ? viewModel.response!.current?.condition?.text ??
+                                  'N/A'
                               : "City Waiting...",
                           style: _customTextStyle(context),
                         ),
